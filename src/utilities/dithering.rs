@@ -5,7 +5,6 @@ pub fn floyd_steinberg(img: &mut DynamicImage) -> DynamicImage {
     let mut dither_image = image::GrayImage::new(img.width(), img.height());
     let mut grey_image = img.clone().grayscale().to_luma8();
 
-    println!("{:?}", grey_image.get_pixel(121, 121).to_luma());
     for y in 0..img.height() {
         for x in 0..img.width() {
             let old_pixel = grey_image.get_pixel(x, y).to_luma();
@@ -14,9 +13,9 @@ pub fn floyd_steinberg(img: &mut DynamicImage) -> DynamicImage {
             let error = (old_pixel.0[0] as f32) - (new_pixel.0[0] as f32);
 
             let error_diffusion: Vec<(i32, i32, f32)> = vec![
-                ((x as i32) + 1, (y as i32), (2.0 / 16.0)),
-                ((x as i32) - 1, (y as i32) + 1, (7.0 / 16.0)),
-                ((x as i32), (y as i32) + 1, (6.0 / 16.0)),
+                ((x as i32) + 1, (y as i32), (7.0 / 16.0)),
+                ((x as i32) - 1, (y as i32) + 1, (3.0 / 16.0)),
+                ((x as i32), (y as i32) + 1, (5.0 / 16.0)),
                 ((x as i32) + 1, (y as i32) + 1, (1.0 / 16.0)),
             ];
 
