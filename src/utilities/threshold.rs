@@ -2,11 +2,16 @@ use image::{DynamicImage, GenericImageView, Luma, Pixel};
 
 pub trait Threshold {
     fn threshold(&self) -> Luma<u8>;
+    fn threshold_by_value(&self, value: u8) -> Luma<u8>;
 }
 
 impl Threshold for Luma<u8> {
     fn threshold(&self) -> Luma<u8> {
-        match self.0[0] > 255 / 2 {
+        self.threshold_by_value(255 / 2)
+    }
+
+    fn threshold_by_value(&self, value: u8) -> Luma<u8> {
+        match self.0[0] > value {
             true => Luma([255]),
             false => Luma([0]),
         }
