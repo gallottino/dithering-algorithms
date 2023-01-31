@@ -1,5 +1,8 @@
 use image::{DynamicImage, GenericImageView, Luma, Pixel};
 
+const BLACK: Luma<u8> = Luma([0]);
+const WHITE: Luma<u8> = Luma([255]);
+
 pub trait Threshold {
     fn threshold(&self) -> Luma<u8>;
     fn threshold_by_value(&self, value: u8) -> Luma<u8>;
@@ -7,13 +10,13 @@ pub trait Threshold {
 
 impl Threshold for Luma<u8> {
     fn threshold(&self) -> Luma<u8> {
-        self.threshold_by_value(255 / 2)
+        self.threshold_by_value(127)
     }
 
     fn threshold_by_value(&self, value: u8) -> Luma<u8> {
         match self.0[0] > value {
-            true => Luma([255]),
-            false => Luma([0]),
+            true => WHITE,
+            false => BLACK,
         }
     }
 }
