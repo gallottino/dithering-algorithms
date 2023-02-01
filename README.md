@@ -3,6 +3,7 @@
 In computer graphics, **dithering** is an image processing operation used to create the illusion of color depth in images with a limited color palette.
 
 ## Ordered Dithering
+
 Threshold matrix applied to each pixel based on its poisition.
 
 - [ ] Threshold Matrix
@@ -12,8 +13,8 @@ Threshold matrix applied to each pixel based on its poisition.
 - [ ] Diagonal ordered matrix with balanced centered points
 - [x] Bayer Matrix
 
-
 ## Diffuse Error
+
 - [ ] One-dimensional error diffusion
 - [ ] Two-dimensional error diffusion
 - [x] Floyd-Steinberg
