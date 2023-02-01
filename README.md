@@ -4,7 +4,7 @@ In computer graphics, **dithering** is an image processing operation used to cre
 
 ## Ordered Dithering
 
-Threshold matrix applied to each pixel based on its poisition.
+Threshold matrix applied to each pixel based on its position.
 
 - [ ] Threshold Matrix
 - [ ] Clustered dots
