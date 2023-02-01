@@ -49,33 +49,51 @@ fn diffuse_error(
 pub enum BayerSize {
     Bayer4,
     Bayer16,
+    Bayer64
 }
 
-pub fn bayer_matrix(img: &mut DynamicImage, matrix_size: BayerSize) -> DynamicImage {
+impl BayerSize {
+    fn from(size: u32) -> BayerSize {
+        match size{
+            2 => BayerSize::Bayer4,
+            4 => BayerSize::Bayer16,
+            8 => BayerSize::Bayer64,
+            _ => todo!("BayerSize Not implemented")
+        }
+    }
+}
+
+pub fn bayer_matrix(img: &mut DynamicImage, matrix_size: u32) -> DynamicImage {
     let mut dither_image = image::GrayImage::new(img.width(), img.height());
     let grey_image = img.clone().grayscale().to_luma8();
 
     for y in 0..img.height() {
         for x in 0..img.width() {
-            if x % 2 != 0 || y % 2 != 0 {
+
+            if x % matrix_size != 0 || y % matrix_size != 0 {
                 continue;
             }
 
-            let bayer_matrix = generate_bayer_matrix(&matrix_size);
-            for y_off in 0..2 {
-                for x_off in 0..2 {
+            let bayer_matrix = generate_bayer_matrix(&BayerSize::from(matrix_size));
+            for y_off in 0..bayer_matrix.len() {
+                for x_off in 0..bayer_matrix[0].len() {
+
+                    let y_off = y_off as u32;
+                    let x_off = x_off as u32;
                     if x + x_off >= img.width() || y + y_off >= img.height() {
                         continue;
                     }
 
-                    dither_image.put_pixel(
-                        x + x_off,
-                        y + y_off,
-                        grey_image
+                    let new_pixel = grey_image
                             .get_pixel(x + x_off, y + y_off)
                             .threshold_by_value(
                                 (255.0 * bayer_matrix[y_off as usize][x_off as usize]) as u8,
-                            ),
+                            );
+                        
+                    dither_image.put_pixel(
+                        x + x_off,
+                        y + y_off,
+                        new_pixel
                     );
                 }
             }
@@ -87,32 +105,53 @@ pub fn bayer_matrix(img: &mut DynamicImage, matrix_size: BayerSize) -> DynamicIm
 fn generate_bayer_matrix(matrix_size: &BayerSize) -> Vec<Vec<f64>> {
     let mut bayer_matrix;
 
-    let bayer_4 = [[0, 2], [3, 1]];
+    let bayer_4 = [[0.0, 2.0], [3.0, 1.0]];
 
     let bayer_16 = [
-        [0, 8, 2, 10],
-        [12, 14, 14, 6],
-        [3, 11, 1, 9],
-        [15, 17, 13, 5],
+        [0.0, 8.0, 2.0, 10.0],
+        [12.0, 4.0, 14.0, 6.0],
+        [3.0, 11.0, 1.0, 9.0],
+        [15.0, 7.0, 13.0, 5.0],
+    ];
+
+    let bayer_64 = [
+        [0.0,32.0,8.0,40.0,2.0,34.0,10.0,42.0],
+        [48.0,16.0,56.0,24.0,50.0,18.0,58.0,26.0],
+        [12.0,44.0,4.0,36.0,14.0,46.0,6.0,38.0],
+        [60.0,28.0,52.0,20.0,62.0,30.0,54.0,22.0],
+        [3.0,35.0,11.0,43.0,1.0,33.0,9.0,41.0],
+        [51.0,19.0,59.0,27.0,49.0,17.0,57.0,25.0],
+        [15.0,47.0,7.0,39.0,13.0,45.0,5.0,37.0],
+        [63.0,31.0,55.0,23.0,61.0,29.0,53.0,21.0]
     ];
 
     match matrix_size {
 
         BayerSize::Bayer4 => {
-            bayer_matrix = vec![vec![0.0; 4]; 4];
+            bayer_matrix = vec![vec![0.0; 2]; 2];
             for i in 0..2 {
                 for j in 0..2 {
-                    bayer_matrix[i][j] = bayer_4[i][j] as f64 / 4.0;
+                    bayer_matrix[i][j] = bayer_4[i][j] / 4.0;
                 }
             }
         }
 
         BayerSize::Bayer16 => {
-            bayer_matrix = vec![vec![0.0; 16]; 16];
+            bayer_matrix = vec![vec![0.0; 4]; 4];
 
             for i in 0..4 {
                 for j in 0..4 {
-                    bayer_matrix[i][j] = bayer_16[i][j] as f64 / 16.0;
+                    bayer_matrix[i][j] = bayer_16[i][j] / 16.0;
+                }
+            }
+        }
+
+        BayerSize::Bayer64 => {
+            bayer_matrix = vec![vec![0.0; 8]; 8];
+
+            for i in 0..8 {
+                for j in 0..8 {
+                    bayer_matrix[i][j] = bayer_64[i][j] / 64.0;
                 }
             }
         }

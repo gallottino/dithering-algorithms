@@ -19,8 +19,10 @@ fn main() {
     grey_out_path.push_str("_grey.png");
     greyscale_img.save(grey_out_path).unwrap();
 
-    let dither_image = utilities::dithering::bayer_matrix(&mut img, utilities::dithering::BayerSize::Bayer16);
+    let dither_image = utilities::dithering::bayer_matrix(&mut img, 8);
+    
+    let dither_image_green = utilities::set_binary_color(&dither_image, image::Rgb([0,0,0]), image::Rgb([255,255,255]));
     let mut dither_out_path = file_name.clone();
     dither_out_path.push_str("_dither.png");
-    dither_image.save(dither_out_path).unwrap();
+    dither_image_green.save(dither_out_path).unwrap();
 }
