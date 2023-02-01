@@ -1,7 +1,6 @@
 use image::{DynamicImage, GenericImageView, Luma, Pixel};
 
-const BLACK: Luma<u8> = Luma([0]);
-const WHITE: Luma<u8> = Luma([255]);
+use super::{WHITE, BLACK};
 
 pub trait Threshold {
     fn threshold(&self) -> Luma<u8>;
